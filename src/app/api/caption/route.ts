@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 // Helper to escape literal newlines inside double-quoted string values (common VLM JSON bug)
 function sanitizeJsonString(rawJson: string): string {
   let result = "";
