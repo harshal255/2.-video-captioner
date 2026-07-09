@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "video-captioner",
+  "compatibility_date": "2026-07-09",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
