@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { extractAudio } from "@/utils/audio";
 import { extractFrames, compressFrameForApi } from "@/utils/video";
+import { sanitizeJsonString, repairTruncatedJson } from "@/utils/json";
 
 interface Captions {
   formal: string;
@@ -42,6 +43,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  // API Key config
+  const [apiKey, setApiKey] = useState("");
+  const [showKeyInput, setShowKeyInput] = useState(false);
+
   // Video Trimmer states
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
@@ -53,6 +58,9 @@ export default function Home() {
     if (savedTheme) {
       setTheme(savedTheme);
     }
+    const savedKey = localStorage.getItem("fireworks_api_key") || "";
+    const envKey = process.env.NEXT_PUBLIC_FIREWORKS_API_KEY || "";
+    setApiKey(savedKey || envKey);
   }, []);
 
   useEffect(() => {
@@ -70,6 +78,14 @@ export default function Home() {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
+  const saveApiKey = (key: string) => {
+    const cleanKey = key.trim();
+    setApiKey(cleanKey);
+    localStorage.setItem("fireworks_api_key", cleanKey);
+    toast.success("Fireworks API Key saved successfully!");
+    setShowKeyInput(false);
   };
 
 
@@ -208,11 +224,19 @@ export default function Home() {
       return;
     }
 
+    if (!apiKey) {
+      const errMsg = "Please configure your Fireworks API Key first.";
+      setError(errMsg);
+      toast.error(errMsg);
+      setShowKeyInput(true);
+      return;
+    }
+
     setIsGenerating(true);
     setError(null);
     setCaptions(null);
     setRawText(null);
-    const toastId = toast.loading("Analyzing frames and generating captions...");
+    const toastId = toast.loading("Analyzing frames and transcribing audio...");
 
     try {
       // 1. Transcribe audio if we have an audio track and haven't transcribed it yet
@@ -222,9 +246,13 @@ export default function Home() {
         try {
           const audioFormData = new FormData();
           audioFormData.append("file", new File([audioBlob], "audio.wav", { type: "audio/wav" }));
+          audioFormData.append("model", "whisper-v3");
 
-          const transcribeRes = await fetch("/api/transcribe", {
+          const transcribeRes = await fetch("https://api.fireworks.ai/inference/v1/audio/transcriptions", {
             method: "POST",
+            headers: {
+              "Authorization": `Bearer ${apiKey}`
+            },
             body: audioFormData
           });
 
@@ -244,36 +272,136 @@ export default function Home() {
       toast.loading("Analyzing frames and generating captions...", { id: toastId });
       const compressedFrames = await Promise.all(frames.map(compressFrameForApi));
 
-      const response = await fetch("/api/caption", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          frames: compressedFrames,
-          model: selectedModel,
-          transcript: transcriptText,
-          customTone: customTone
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to generate video captions.");
+      let toneInstruction = "";
+      if (customTone && customTone.trim().length > 0) {
+        toneInstruction = `\n\nCRITICAL STYLE / TONE OF VOICE DIRECTION:\nThe user has requested a specific brand voice/writing style. You MUST adapt all captions ("formal", "sarcastic", "humorousTech", "humorousNonTech"), hooks, voiceover script, and description to match the following style instructions:\n"${customTone.trim()}"`;
       }
 
-      if (data.captions) {
-        setCaptions(data.captions);
-        toast.success("Captions generated successfully!", { id: toastId });
-      } else if (data.rawText) {
-        setRawText(data.rawText);
-        if (data.error) {
-          setError(data.error); // Show warning if format parsing was slightly off
-          toast.error(data.error, { id: toastId });
-        } else {
-          toast.success("Captions generated successfully!", { id: toastId });
+      const contentPayload: any[] = [
+        {
+          type: "text",
+          text: `You are an expert video captioner and creative writer.
+You are given a sequence of keyframes extracted chronologically from a short video clip.${transcriptText ? `\n\nWe have also transcribed the spoken audio dialogue from the video:\n"${transcriptText}"\nUse this spoken dialogue context, names, and verbal cues to align your captions with what is being said in the clip.` : ""}
+Analyze these frames carefully to understand the events, environment, people, actions, and emotions.
+
+Based on your internal analysis, generate the following content for this video:
+1. "formal": A professional, clear, and objective description of what happens in the video.
+2. "sarcastic": A witty, sarcastic, or mockingly critical caption about what is happening in the video.
+3. "humorousTech": A funny caption tailored for programmers, developers, or tech enthusiasts (use coding terms, tech culture references, bugs, compiling, AI, etc.).
+4. "humorousNonTech": A broadly funny, relatable, and humorous caption for everyday viewers.
+5. "viralHooks": An array of exactly 3 high-impact, attention-grabbing text overlay hooks for the first 3 seconds of the video, based on visual hooks in the starting frames (e.g. "POV: You find a bug in prod...", "I didn't expect this...").
+6. "voiceoverScript": A short, concise 2-sentence storytelling voiceover/narration script that matches the chronological flow of the storyboard keyframes.
+7. "seoKeywords": An array of up to 12 highly optimized search keywords (e.g., "react debugging tips", "coding compilation error") based on the visual contents and transcript.
+8. "seoHashtags": An array of exactly 5 relevant, lowercase hashtags (e.g., ["#coding", "#dev", "#programmer", "#webdev", "#javascript"]) for backward compatibility.
+9. "seoDescription": A brief 2-sentence SEO-optimized description paragraph incorporating the transcript, dialogue, and keywords naturally to boost social platform search indexing.${toneInstruction}
+
+CRITICAL FORMATTING RULES:
+- Do NOT output any frame-by-frame descriptions, analysis list, or explanations in your response content. Keep your analysis entirely internal.
+- Do NOT include any conversational intro, filler, or outro.
+- Your entire response MUST start with '{' and end with '}'.
+- Output ONLY the raw JSON object.
+
+Your response MUST be a valid JSON object matching the following structure:
+{
+  "formal": "Your formal caption here.",
+  "sarcastic": "Your sarcastic caption here.",
+  "humorousTech": "Your humorous tech-related caption here.",
+  "humorousNonTech": "Your humorous non-tech/general caption here.",
+  "viralHooks": ["Hook 1", "Hook 2", "Hook 3"],
+  "voiceoverScript": "Your concise 2-sentence voiceover script narration.",
+  "seoKeywords": ["keyword1", "keyword2", "keyword3"],
+  "seoHashtags": ["#tag1", "#tag2", "#tag3", "#tag4", "#tag5"],
+  "seoDescription": "Your brief 2-sentence SEO-optimized description paragraph here."
+}`
         }
+      ];
+
+      compressedFrames.forEach((base64Frame: string) => {
+        let imageUrl = base64Frame;
+        if (!imageUrl.startsWith("data:image/")) {
+          imageUrl = `data:image/jpeg;base64,${base64Frame}`;
+        }
+        contentPayload.push({
+          type: "image_url",
+          image_url: {
+            url: imageUrl
+          }
+        });
+      });
+
+      const response = await fetch("https://api.fireworks.ai/inference/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: selectedModel,
+          messages: [
+            {
+              role: "user",
+              content: contentPayload
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 4000
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Fireworks API error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      const assistantMessage = data.choices?.[0]?.message?.content;
+
+      if (!assistantMessage) {
+        throw new Error("Empty response received from the AI model.");
+      }
+
+      console.log("Raw Assistant Response:", assistantMessage);
+
+      let jsonContent = assistantMessage.trim();
+      if (jsonContent.startsWith("```json")) {
+        jsonContent = jsonContent.slice(7);
+      } else if (jsonContent.startsWith("```")) {
+        jsonContent = jsonContent.slice(3);
+      }
+      if (jsonContent.endsWith("```")) {
+        jsonContent = jsonContent.slice(0, -3);
+      }
+      jsonContent = jsonContent.trim();
+
+      const firstBrace = jsonContent.indexOf("{");
+      if (firstBrace !== -1) {
+        jsonContent = jsonContent.substring(firstBrace);
+      }
+
+      let cleanedMessage = repairTruncatedJson(jsonContent);
+      cleanedMessage = sanitizeJsonString(cleanedMessage);
+      cleanedMessage = cleanedMessage.replace(/,\s*([\]}])/g, "$1");
+
+      try {
+        const parsedCaptions = JSON.parse(cleanedMessage);
+
+        if (!parsedCaptions.formal || !parsedCaptions.sarcastic || !parsedCaptions.humorousTech || !parsedCaptions.humorousNonTech) {
+          throw new Error("Missing required JSON fields in AI response.");
+        }
+
+        if (!parsedCaptions.viralHooks) parsedCaptions.viralHooks = [];
+        if (!parsedCaptions.voiceoverScript) parsedCaptions.voiceoverScript = "";
+        if (!parsedCaptions.seoKeywords) parsedCaptions.seoKeywords = [];
+        if (!parsedCaptions.seoHashtags) parsedCaptions.seoHashtags = [];
+        if (!parsedCaptions.seoDescription) parsedCaptions.seoDescription = "";
+
+        setCaptions(parsedCaptions);
+        toast.success("Captions generated successfully!", { id: toastId });
+      } catch (parseError) {
+        console.error("Failed to parse AI response as JSON:", cleanedMessage, parseError);
+        setRawText(assistantMessage);
+        setError("Response format was not strictly JSON, showing raw output.");
+        toast.error("Response format was not strictly JSON, showing raw output.", { id: toastId });
       }
     } catch (err: any) {
       console.error("Caption generation error:", err);
@@ -294,7 +422,14 @@ export default function Home() {
       <div className="w-full max-w-7xl px-6 md:px-8 py-6 flex-1 flex flex-col z-10">
 
         {/* Header Branding */}
-        <Header theme={theme} toggleTheme={toggleTheme} />
+        <Header
+          theme={theme}
+          toggleTheme={toggleTheme}
+          apiKey={apiKey}
+          saveApiKey={saveApiKey}
+          showKeyInput={showKeyInput}
+          setShowKeyInput={setShowKeyInput}
+        />
 
         {/* Layout Flow: Stacked Rows (Row 1: Upload & Storyboard side-by-side; Row 2: Settings & Captions below) */}
         <main className="flex flex-col gap-6 flex-1">
