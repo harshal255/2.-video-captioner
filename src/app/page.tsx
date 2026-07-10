@@ -43,10 +43,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // API Key config
-  const [apiKey, setApiKey] = useState("");
-  const [showKeyInput, setShowKeyInput] = useState(false);
-
   // Video Trimmer states
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
@@ -58,9 +54,6 @@ export default function Home() {
     if (savedTheme) {
       setTheme(savedTheme);
     }
-    const savedKey = localStorage.getItem("fireworks_api_key") || "";
-    const envKey = process.env.NEXT_PUBLIC_FIREWORKS_API_KEY || "";
-    setApiKey(savedKey || envKey);
   }, []);
 
   useEffect(() => {
@@ -78,14 +71,6 @@ export default function Home() {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
-  const saveApiKey = (key: string) => {
-    const cleanKey = key.trim();
-    setApiKey(cleanKey);
-    localStorage.setItem("fireworks_api_key", cleanKey);
-    toast.success("Fireworks API Key saved successfully!");
-    setShowKeyInput(false);
   };
 
 
@@ -224,11 +209,12 @@ export default function Home() {
       return;
     }
 
+    const apiKey = process.env.NEXT_PUBLIC_FIREWORKS_API_KEY || "";
+
     if (!apiKey) {
-      const errMsg = "Please configure your Fireworks API Key first.";
+      const errMsg = "Fireworks API Key is not configured. Please check your environment variables.";
       setError(errMsg);
       toast.error(errMsg);
-      setShowKeyInput(true);
       return;
     }
 
@@ -422,14 +408,7 @@ Your response MUST be a valid JSON object matching the following structure:
       <div className="w-full max-w-7xl px-6 md:px-8 py-6 flex-1 flex flex-col z-10">
 
         {/* Header Branding */}
-        <Header
-          theme={theme}
-          toggleTheme={toggleTheme}
-          apiKey={apiKey}
-          saveApiKey={saveApiKey}
-          showKeyInput={showKeyInput}
-          setShowKeyInput={setShowKeyInput}
-        />
+        <Header theme={theme} toggleTheme={toggleTheme} />
 
         {/* Layout Flow: Stacked Rows (Row 1: Upload & Storyboard side-by-side; Row 2: Settings & Captions below) */}
         <main className="flex flex-col gap-6 flex-1">
