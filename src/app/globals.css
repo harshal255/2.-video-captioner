@@ -105,10 +105,10 @@
 
   /* Redefine zinc variables inside light mode to match Claude Light warm greys */
   --color-zinc-950: #ffffff;
-  --color-zinc-900: #f5f2eb;
-  --color-zinc-850: #eae6df;
-  --color-zinc-800: #e5e0d8;
-  --color-zinc-700: #d5cfc5;
+  --color-zinc-900: #eae6df;
+  --color-zinc-850: #e5e0d8;
+  --color-zinc-800: #d5cfc5;
+  --color-zinc-700: #c1baa9;
   --color-zinc-650: #a19d95;
   --color-zinc-600: #8a857c;
   --color-zinc-500: #706f6b;

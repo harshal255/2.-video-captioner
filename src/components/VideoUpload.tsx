@@ -276,8 +276,8 @@ export default function VideoUpload({
           onDrop={handleDrop}
           onClick={triggerFileInput}
           className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 ${isDragActive
-              ? "border-amber-500 bg-amber-950/10 shadow-[0_0_20px_rgba(212,160,64,0.15)]"
-              : "border-zinc-800 bg-zinc-950/40 hover:border-zinc-700 hover:bg-zinc-950/60"
+            ? "border-amber-500 bg-amber-950/10 shadow-[0_0_20px_rgba(212,160,64,0.15)]"
+            : "border-zinc-800 bg-zinc-950/40 hover:border-zinc-700 hover:bg-zinc-950/60"
             }`}
           id="upload-dropzone"
         >
