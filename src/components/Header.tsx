@@ -12,8 +12,10 @@ export default function Header({ theme, toggleTheme }: HeaderProps) {
   return (
     <>
       {/* Navigation / Header Brand */}
-      <header className="w-full flex items-center justify-between border-b border-zinc-900 pb-4 mb-6">
-        <div className="flex items-center gap-2.5">
+      <header className="w-full flex items-center justify-between border-b border-border pb-4 mb-6">
+        <div className="flex items-center gap-3">
+          {/* Logo Icon */}
+          <img src="/icon.svg" alt="NovaCaption Logo" className="w-7 h-7 object-contain" />
           <div>
             <span className="text-xs font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#d97754] via-[#e99f82] to-[#cc7b5c] font-sans">
               NovaCaption AI
@@ -39,7 +41,7 @@ export default function Header({ theme, toggleTheme }: HeaderProps) {
 
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-            <span className="text-[10px] text-zinc-400 font-medium font-mono">Vision API Ready</span>
+            <span className="text-[10px] text-zinc-400 font-medium font-mono">AI Processing Ready</span>
           </div>
         </div>
       </header>
