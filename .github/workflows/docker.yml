@@ -25,7 +25,8 @@ jobs:
 
       - name: Downcase repository owner and name
         run: |
-          echo "IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=ghcr.io/$OWNER/video-captioner" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
