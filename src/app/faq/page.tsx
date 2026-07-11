@@ -99,8 +99,10 @@ export default function FaqPage() {
             <Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
             <span>•</span>
             <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <span>•</span>
-            <Link href="/sitemap" className="hover:text-primary transition-colors">Sitemap</Link>
+            <span className="opacity-0 absolute pointer-events-none w-px h-px overflow-hidden select-none">
+              <span>•</span>
+              <Link href="/sitemap" className="hover:text-primary transition-colors">Sitemap</Link>
+            </span>
           </div>
           <p className="font-sans text-zinc-500">© 2026 NovaCaption AI. Built with Next.js, Tailwind v4 & Fireworks AI.</p>
         </footer>

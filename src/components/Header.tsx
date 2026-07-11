@@ -17,10 +17,10 @@ export default function Header({ theme, toggleTheme }: HeaderProps) {
           {/* Logo Icon */}
           <img src="/icon.svg" alt="NovaCaption Logo" className="w-7 h-7 object-contain" />
           <div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#d97754] via-[#e99f82] to-[#cc7b5c] font-sans">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#d97754] via-[#e99f82] to-[#cc7b5c] font-sans whitespace-nowrap">
               NovaCaption AI
             </span>
-            <p className="text-[9px] text-zinc-500 font-medium font-sans">Video Captioning Suite</p>
+            <p className="text-[9px] text-zinc-500 font-medium font-sans whitespace-nowrap">Video Captioning Suite</p>
           </div>
         </div>
 
@@ -39,7 +39,7 @@ export default function Header({ theme, toggleTheme }: HeaderProps) {
             )}
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
             <span className="text-[10px] text-zinc-400 font-medium font-mono">AI Processing Ready</span>
           </div>

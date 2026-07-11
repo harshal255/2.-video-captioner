@@ -70,7 +70,7 @@ export default function CaptionGrid({ captions, rawText }: CaptionGridProps) {
   if (rawText && !captions) {
     return (
       <div className="w-full mt-8 animate-in fade-in duration-300" id="chatbot-response-container">
-        <div className="w-full bg-zinc-950/45 border border-zinc-900/80 rounded-2xl p-5 md:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-4">
+        <div className="w-full bg-zinc-950/45 border border-zinc-900/80 rounded-2xl p-4 sm:p-5 md:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-4">
 
           {/* Chatbot Header */}
           <div className="flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -160,7 +160,7 @@ export default function CaptionGrid({ captions, rawText }: CaptionGridProps) {
 
   return (
     <div className="w-full mt-8 animate-in fade-in duration-300" id="chatbot-response-container">
-      <div className="w-full bg-zinc-950/45 border border-zinc-900/80 rounded-2xl p-5 md:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-5">
+      <div className="w-full bg-zinc-950/45 border border-zinc-900/80 rounded-2xl p-4 sm:p-5 md:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-5">
 
         {/* Chatbot Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-900">

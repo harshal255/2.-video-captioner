@@ -325,6 +325,10 @@ Your response MUST be a valid JSON object matching the following structure:
           model: selectedModel,
           messages: [
             {
+              role: "system",
+              content: "You are a strict JSON generator. Your output must contain ONLY a valid JSON object matching the requested schema. Do not output any thought process, explanations, markdown codes, or conversational text. Your output must start with '{' and end with '}'."
+            },
+            {
               role: "user",
               content: contentPayload
             }
@@ -360,7 +364,10 @@ Your response MUST be a valid JSON object matching the following structure:
       jsonContent = jsonContent.trim();
 
       const firstBrace = jsonContent.indexOf("{");
-      if (firstBrace !== -1) {
+      const lastBrace = jsonContent.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonContent = jsonContent.substring(firstBrace, lastBrace + 1);
+      } else if (firstBrace !== -1) {
         jsonContent = jsonContent.substring(firstBrace);
       }
 
@@ -405,19 +412,19 @@ Your response MUST be a valid JSON object matching the following structure:
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-gradient-to-b from-[#cc7b5c]/5 to-transparent blur-[100px] pointer-events-none rounded-full" />
 
       {/* Main Container */}
-      <div className="w-full max-w-7xl px-6 md:px-8 py-6 flex-1 flex flex-col z-10">
+      <div className="w-full max-w-7xl px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex-1 flex flex-col z-10">
 
         {/* Header Branding */}
         <Header theme={theme} toggleTheme={toggleTheme} />
 
         {/* Layout Flow: Stacked Rows (Row 1: Upload & Storyboard side-by-side; Row 2: Settings & Captions below) */}
-        <main className="flex flex-col gap-6 flex-1">
+        <main className="flex flex-col gap-4 sm:gap-6 flex-1">
 
           {/* Row 1: Upload & Storyboard side-by-side */}
-          <div className={selectedFile ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start" : "w-full"}>
+          <div className={selectedFile ? "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start" : "w-full"}>
 
             {/* Left Card: Upload Media */}
-            <div className="p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl min-w-0">
+            <div className="p-4 sm:p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl min-w-0">
               <h2 className="text-xs font-bold text-zinc-200 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <span>1. Upload Media</span>
               </h2>
@@ -435,7 +442,7 @@ Your response MUST be a valid JSON object matching the following structure:
 
             {/* Right Card: Storyboard Carousel (always stays side-by-side when video is selected to prevent layout shifting) */}
             {selectedFile && (
-              <div className="p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl min-w-0 min-h-[280px]">
+              <div className="p-4 sm:p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl min-w-0 min-h-[280px]">
                 {isExtracting || frames.length === 0 ? (
                   <div className="flex flex-col gap-4 w-full h-full animate-in fade-in duration-300">
                     <div className="flex items-center justify-between border-b border-zinc-900/60 pb-3">
@@ -489,8 +496,8 @@ Your response MUST be a valid JSON object matching the following structure:
           </div>
 
           {/* Row 2: Parameters, Action, Error Banner & Captions Output stacked vertically below Row 1 */}
-          <div className="flex flex-col gap-6 w-full">
-            <div className="p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:gap-6 w-full">
+            <div className="p-4 sm:p-5 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-xl flex flex-col gap-3.5 sm:gap-4">
               <h2 className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
                 2. Parameters & Settings
               </h2>
@@ -547,7 +554,7 @@ Your response MUST be a valid JSON object matching the following structure:
                 onClick={generateCaptions}
                 disabled={!mounted || isGenerating || frames.length === 0 || isExtracting}
                 suppressHydrationWarning
-                className="w-fit self-start mt-1 py-2.5 px-6 rounded-lg font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:pointer-events-none disabled:hover:scale-100 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-sm text-sm flex items-center justify-center gap-2"
+                className="w-full sm:w-fit sm:self-start mt-1 py-2.5 px-6 rounded-lg font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:pointer-events-none disabled:hover:scale-100 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-sm text-sm flex items-center justify-center gap-2"
                 id="btn-generate-captions"
               >
                 {isGenerating ? (

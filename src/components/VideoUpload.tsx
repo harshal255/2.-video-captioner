@@ -294,7 +294,7 @@ export default function VideoUpload({
           </div>
         </div>
       ) : (
-        <div className="relative flex flex-col p-6 rounded-2xl border border-zinc-800 bg-zinc-950/60 backdrop-blur-md">
+        <div className="relative flex flex-col p-3.5 sm:p-6 w-full min-w-0 rounded-2xl border border-zinc-800 bg-zinc-950/60 backdrop-blur-md">
           <button
             onClick={onVideoCleared}
             className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-full border border-zinc-800 transition-all z-10"
@@ -398,19 +398,19 @@ export default function VideoUpload({
 
           {/* Video Trimmer / Clipper Controls */}
           {duration > 0 && (
-            <div className="mt-4 p-4 rounded-xl border border-zinc-900/60 bg-zinc-950/40 flex flex-col gap-3">
-              <div className="flex items-center justify-between mb-1">
+            <div className="mt-4 p-3 sm:p-4 w-full min-w-0 rounded-xl border border-zinc-900/60 bg-zinc-950/40 flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 font-sans">
                   <Scissors className="w-3.5 h-3.5 text-primary" />
                   Video Trimmer / Clipper
                 </span>
-                <span className="text-[10px] font-mono text-zinc-400 font-bold bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] font-mono text-zinc-400 font-bold bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-md self-start sm:self-auto">
                   Range: {formatTime(trimStart)} - {formatTime(trimEnd)}
                 </span>
               </div>
 
               {/* Live Boundary Frame Previews */}
-              <div className="grid grid-cols-2 gap-4 mb-2.5">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 sm:gap-4 mb-2.5">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[9px] font-extrabold text-zinc-550 uppercase tracking-wider font-sans">
                     Start Frame Preview ({formatTime(trimStart)})
@@ -453,10 +453,10 @@ export default function VideoUpload({
               </div>
 
               {/* Trimmer Sliders */}
-              <div className="flex flex-col gap-3 mt-1">
+              <div className="flex flex-col gap-3 mt-1 w-full">
                 {/* Start Slider */}
-                <div className="flex items-center gap-3">
-                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 font-sans">START</span>
+                <div className="flex items-center gap-3 w-full">
+                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 shrink-0 font-sans">START</span>
                   <input
                     type="range"
                     min={0}
@@ -469,14 +469,14 @@ export default function VideoUpload({
                         onTrimChange(val, trimEnd);
                       }
                     }}
-                    className="flex-1 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 w-full min-w-0 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
                   />
-                  <span className="text-[10px] font-mono text-zinc-400 w-10 text-right">{formatTime(trimStart)}</span>
+                  <span className="text-[10px] font-mono text-zinc-400 w-10 shrink-0 text-right">{formatTime(trimStart)}</span>
                 </div>
 
                 {/* End Slider */}
-                <div className="flex items-center gap-3">
-                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 font-sans">END</span>
+                <div className="flex items-center gap-3 w-full">
+                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 shrink-0 font-sans">END</span>
                   <input
                     type="range"
                     min={0}
@@ -489,9 +489,9 @@ export default function VideoUpload({
                         onTrimChange(trimStart, val);
                       }
                     }}
-                    className="flex-1 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 w-full min-w-0 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
                   />
-                  <span className="text-[10px] font-mono text-zinc-400 w-10 text-right">{formatTime(trimEnd)}</span>
+                  <span className="text-[10px] font-mono text-zinc-400 w-10 shrink-0 text-right">{formatTime(trimEnd)}</span>
                 </div>
               </div>
 

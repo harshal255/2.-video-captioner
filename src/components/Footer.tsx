@@ -14,6 +14,10 @@ export default function Footer() {
         <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
         <span>•</span>
         <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+        <span className="opacity-0 absolute pointer-events-none w-px h-px overflow-hidden select-none">
+          <span>•</span>
+          <Link href="/sitemap" className="hover:text-primary transition-colors">Sitemap</Link>
+        </span>
       </div>
       <p className="font-sans text-zinc-500">© 2026 NovaCaption AI. All rights reserved.</p>
     </footer>
