@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="About Us — FrameCraft Video Frame Extractor"
+  description="Learn more about FrameCraft, our mission to build ultra-fast, 100% private, browser-based media conversion tools for creators globally."
+>
+  <div class="max-w-4xl mx-auto py-8 space-y-8 font-sans">
+    <div class="border-b border-zinc-850 pb-6">
+      <h1 class="text-3xl font-extrabold text-zinc-100 tracking-tight">About FrameCraft</h1>
+      <p class="text-xs text-amber-500 font-mono mt-1 uppercase tracking-wider">Fast • Private • Client-Side Media Micro Tools</p>
+    </div>
+
+    <div class="space-y-4 text-sm text-zinc-300 leading-relaxed">
+      <p>
+        <strong>FrameCraft</strong> was created with a single objective: to build clean, frictionless, and lightning-fast media processing utilities that operate 100% inside your web browser.
+      </p>
+
+      <h2 class="text-lg font-bold text-zinc-100 mt-6">Our Core Principles</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+        <div class="p-4 rounded-xl border border-zinc-850 bg-zinc-900/60 flex flex-col gap-1.5">
+          <h3 class="font-bold text-amber-400 text-sm">🔒 Absolute Privacy</h3>
+          <p class="text-xs text-zinc-400">We believe your video assets and creative files belong strictly to you. By utilizing browser HTML5 canvas decoders, no video file is ever uploaded to an external server.</p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-zinc-850 bg-zinc-900/60 flex flex-col gap-1.5">
+          <h3 class="font-bold text-amber-400 text-sm">⚡ Zero Cost & Infinite Speed</h3>
+          <p class="text-xs text-zinc-400">Because calculations execute on your local GPU/CPU hardware, there are no queue delays, server timeouts, or subscription paywalls.</p>
+        </div>
+      </div>
+
+      <h2 class="text-lg font-bold text-zinc-100 mt-6">Global Accessibility</h2>
+      <p>
+        FrameCraft is designed for users worldwide across North America, Europe, Asia-Pacific, Latin America, and Africa. Hosted on Cloudflare's global edge network, our application loads in under a second from any continent.
+      </p>
+    </div>
+  </div>
+</Layout>

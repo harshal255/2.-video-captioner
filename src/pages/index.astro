@@ -1,0 +1,207 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VideoFrameExtractorApp from '../components/VideoFrameExtractorApp';
+import AdBanner from '../components/AdBanner';
+
+const faqItems = [
+  {
+    question: "Is FrameCraft free to use to extract frames from videos?",
+    answer: "Yes, FrameCraft is 100% free with no hidden fees, trial periods, or registration required. You can extract unlimited frames from any video clip instantly."
+  },
+  {
+    question: "Are my video files uploaded to a remote server?",
+    answer: "No. FrameCraft uses HTML5 browser canvas technology to process video frames directly on your device locally. Your video files never leave your browser, guaranteeing complete privacy and security."
+  },
+  {
+    question: "How do I extract a frame every 1 second or 5 seconds?",
+    answer: "Select the 'Time Interval' extraction mode in the parameter controls, type '1' or '5' in the seconds input, and click 'Extract Frames Now'. The tool will automatically grab one high-resolution frame at your chosen interval across the video."
+  },
+  {
+    question: "Can I download all extracted video frames at once?",
+    answer: "Yes! Once extraction is complete, click the 'Download ZIP' button. All keyframes will be packaged into a clean .zip file containing high-resolution JPEG, PNG, or WEBP images."
+  },
+  {
+    question: "What video formats are supported by this online frame grabber?",
+    answer: "FrameCraft supports all video formats recognized by modern web browsers, including MP4, WebM, MOV, AVI, and MKV."
+  },
+  {
+    question: "How do I create a storyboard grid from my video clip?",
+    answer: "After extracting keyframes, click the 'Storyboard Grid' button in the gallery. FrameCraft will automatically compile your frames into a clean, professional grid layout image ready for download."
+  },
+  {
+    question: "Can I trim a specific segment of the video before extracting images?",
+    answer: "Yes! Use our built-in video trimmer sliders to select precise start and end timestamps. FrameCraft will extract keyframes exclusively within your specified timeline range."
+  },
+  {
+    question: "What is the maximum image resolution I can export?",
+    answer: "You can export images in their native original video resolution (including 4K and 1080p Full HD) or scale them down to 1080p, 720p, or 480p for reduced file size."
+  }
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+};
+---
+
+<Layout
+  title="Free Video to Frame Extractor & Storyboard Generator — FrameCraft"
+  description="Extract high-quality images, keyframes, and storyboards from MP4, WebM & MOV videos in seconds. 100% private, free, in-browser frame grabber with ZIP batch download."
+>
+  <!-- JSON-LD FAQ Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  <!-- Hero & Tool Section -->
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-col items-center text-center max-w-3xl mx-auto mt-4 mb-2">
+      <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-mono font-bold mb-3">
+        ⚡ 100% In-Browser • Fast & Private
+      </span>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 font-sans leading-tight">
+        Extract Frames & Storyboards <br class="hidden sm:inline" />
+        <span class="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 dark:from-amber-400 dark:via-amber-500 dark:to-amber-600 bg-clip-text text-transparent">From Any Video Instantly</span>
+      </h1>
+      <p class="mt-3 text-sm sm:text-base text-slate-600 dark:text-zinc-400 max-w-2xl font-sans font-medium">
+        Convert video clips into high-resolution images. Extract keyframes by count, time interval (every N seconds), or frame rate (FPS). Export batch ZIP archives or compiled storyboard grids.
+      </p>
+    </div>
+
+    <!-- Top AdSense Banner -->
+    <AdBanner client:load slot="9876543210" label="Top Advertisement" />
+
+    <!-- Core Interactive Tool App -->
+    <VideoFrameExtractorApp client:load />
+
+    <!-- Feature Highlights -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+      <div class="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 flex flex-col gap-2 shadow-md">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
+          🔒
+        </div>
+        <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-200 uppercase tracking-wider font-sans">100% Private & Local</h3>
+        <p class="text-xs text-slate-600 dark:text-zinc-500">Processing happens entirely inside your browser canvas. No video files are ever uploaded to any server.</p>
+      </div>
+
+      <div class="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 flex flex-col gap-2 shadow-md">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
+          ⏱️
+        </div>
+        <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-200 uppercase tracking-wider font-sans">Dynamic Modes</h3>
+        <p class="text-xs text-slate-600 dark:text-zinc-500">Extract by exact frame count, time interval (e.g. every 2 sec), or frame rate (FPS) with timestamp precision.</p>
+      </div>
+
+      <div class="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 flex flex-col gap-2 shadow-md">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
+          📦
+        </div>
+        <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-200 uppercase tracking-wider font-sans">Batch ZIP Download</h3>
+        <p class="text-xs text-slate-600 dark:text-zinc-500">Download all extracted keyframes at once in a compressed .zip file formatted as JPEG, PNG, or WEBP.</p>
+      </div>
+
+      <div class="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 flex flex-col gap-2 shadow-md">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
+          🖼️
+        </div>
+        <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-200 uppercase tracking-wider font-sans">Storyboard Grid Builder</h3>
+        <p class="text-xs text-slate-600 dark:text-zinc-500">Compile frames automatically into a clean presentation grid image for pitch decks, visual design, and review.</p>
+      </div>
+    </div>
+
+    <!-- 1000+ Words In-Depth On-Page SEO Guide Article -->
+    <article class="mt-12 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/40 text-slate-800 dark:text-zinc-300 space-y-6 text-sm leading-relaxed font-sans shadow-xl">
+      <header class="border-b border-slate-200 dark:border-zinc-800 pb-4">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight">
+          Complete Guide: How to Extract High-Quality Frames and Storyboards from Any Video
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-zinc-500 mt-1 font-mono">Published by FrameCraft Media Tools • Updated for 2026</p>
+      </header>
+
+      <section class="space-y-3">
+        <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">What is a Video Frame Extractor & How Does It Work?</h3>
+        <p class="text-slate-700 dark:text-zinc-300">
+          A <strong>Video Frame Extractor</strong> (also referred to as a <em>video frame grabber</em> or <em>video to image converter</em>) is a web-based utility designed to capture still image snapshots from digital video files. Every video is composed of a continuous sequence of individual pictures called frames, typically rendered at speeds ranging from 24 to 60 frames per second (FPS).
+        </p>
+        <p class="text-slate-700 dark:text-zinc-300">
+          Traditional software tools required users to install heavy desktop applications or manually take screenshot commands while watching a video playback. <strong>FrameCraft</strong> completely eliminates this friction by leveraging modern HTML5 browser APIs. By drawing video data directly to an HTML canvas context, FrameCraft accesses the hardware video decoder built into your device. This allows instant, lossless frame grabbing without requiring file uploads or server-side processing.
+        </p>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">Why Extract Images and Keyframes from Video Clips?</h3>
+        <p class="text-slate-700 dark:text-zinc-300">
+          Extracting still frames from video files is a critical workflow requirement across multiple creative and technical disciplines:
+        </p>
+        <ul class="list-disc pl-6 space-y-1.5 text-slate-700 dark:text-zinc-400">
+          <li><strong>Content Creators & YouTubers:</strong> Instantly capture crisp, high-resolution thumbnail images directly from raw footage without setting up dedicated photography sessions.</li>
+          <li><strong>Filmmakers & Animators:</strong> Generate sequential visual storyboards and pitch deck keyframes to communicate narrative flow and scene framing with visual teams.</li>
+          <li><strong>UI/UX Designers & Motion Graphics Artists:</strong> Inspect frame-by-frame UI animations, micro-interactions, and visual transitions for quality assurance.</li>
+          <li><strong>Graphic Designers:</strong> Pull raw visual references, background textures, and high-quality hero images directly from commercial footage.</li>
+          <li><strong>Researchers & Educators:</strong> Extract specific visual evidence, laboratory experiment keyframes, or instructional diagram steps from video documentation.</li>
+        </ul>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">Flexible Frame Extraction Modes</h3>
+        <p class="text-slate-700 dark:text-zinc-300">
+          FrameCraft offers three distinct extraction modes to fit any workflow requirements:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-3 text-xs">
+          <div class="p-3.5 rounded-lg bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold text-slate-900 dark:text-zinc-200 text-sm mb-1">1. Custom Frame Count</h4>
+            <p className="text-slate-600 dark:text-zinc-400">Specify an exact number of keyframes (e.g. 5, 12, 50). FrameCraft calculates mathematically uniform intervals across your video or trimmed timeline range.</p>
+          </div>
+          <div class="p-3.5 rounded-lg bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold text-slate-900 dark:text-zinc-200 text-sm mb-1">2. Time Interval (Seconds)</h4>
+            <p className="text-slate-600 dark:text-zinc-400">Extract 1 frame every N seconds (e.g. every 0.5s, 1s, 2s, 10s). Ideal for long-form screen recordings, tutorials, and security footage analysis.</p>
+          </div>
+          <div class="p-3.5 rounded-lg bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
+            <h4 class="font-bold text-slate-900 dark:text-zinc-200 text-sm mb-1">3. Frame Rate (FPS)</h4>
+            <p className="text-slate-600 dark:text-zinc-400">Define a constant frame capture rate per second (e.g., 1 FPS, 2 FPS). Perfect for animation breakdown and high-frequency motion tracking.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">Privacy & Client-Side Edge Performance</h3>
+        <p class="text-slate-700 dark:text-zinc-300">
+          In an era of increasing digital privacy concerns, uploading proprietary video footage or sensitive client assets to unknown cloud servers poses significant security risks. FrameCraft operates under a strict <strong>zero-upload architecture</strong>. All video reading, timeline trimming, frame decoding, image encoding (JPEG, PNG, WEBP), ZIP compression, and storyboard grid compilation take place entirely within your browser sandboxed JavaScript environment.
+        </p>
+      </section>
+    </article>
+
+    <!-- Bottom AdSense Banner -->
+    <AdBanner client:load slot="1122334455" label="Bottom Advertisement" className="mt-6" />
+
+    <!-- FAQ Section (SEO Optimized) -->
+    <section id="faq" class="mt-8 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/60 backdrop-blur-xl shadow-xl">
+      <div class="flex flex-col gap-2 mb-6 text-center">
+        <span class="text-xs font-mono uppercase tracking-widest text-amber-600 dark:text-amber-500 font-bold">Frequently Asked Questions</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight font-sans">
+          Got Questions? We've Got Answers
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {faqItems.map((item) => (
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 flex flex-col gap-2">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-zinc-200 font-sans flex items-start gap-2">
+              <span class="text-amber-500 shrink-0">Q.</span>
+              <span>{item.question}</span>
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-zinc-400 pl-5 font-sans leading-relaxed">
+              {item.answer}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</Layout>

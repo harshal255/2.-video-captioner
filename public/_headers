@@ -1,0 +1,8 @@
+# Prevent indexing of default *.pages.dev subdomain when custom domain is connected
+https://*.pages.dev/*
+  X-Robots-Tag: noindex
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin

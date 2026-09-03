@@ -1,0 +1,145 @@
+---
+import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle';
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  image?: string;
+  canonicalUrl?: string;
+}
+
+const {
+  title = "FrameCraft — Free Online Video to Image & Storyboard Extractor",
+  description = "Extract high-resolution frames, keyframes, and image storyboards from any video file instantly in your browser. 100% private, free, and no upload needed.",
+  keywords = "video to frame, extract frames from video, video frame grabber, video storyboard generator, video to image converter, extract keyframes mp4",
+  image = "/og-image.png",
+  canonicalUrl = "https://framecraft.org"
+} = Astro.props;
+
+const webAppSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "FrameCraft Video Frame Extractor",
+  "url": canonicalUrl,
+  "description": description,
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Theme anti-flicker script -->
+    <script is:inline>
+      (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.classList.toggle('dark', saved === 'dark');
+        } else {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', prefersDark);
+        }
+      })();
+    </script>
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- JSON-LD WebApplication Schema -->
+    <script type="application/ld+json" set:html={JSON.stringify(webAppSchema)} />
+  </head>
+  <body class="min-h-screen flex flex-col antialiased bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 transition-colors duration-200">
+    <!-- Background subtle radial glow -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[350px] bg-gradient-to-b from-amber-500/10 via-amber-500/5 to-transparent blur-[120px] pointer-events-none rounded-full z-0"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full border-b border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50 transition-colors shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-zinc-950 font-bold shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-base tracking-tight text-slate-900 dark:text-zinc-100 group-hover:text-amber-500 transition-colors">
+              FrameCraft<span class="text-amber-500">.</span>
+            </span>
+            <span class="text-[9px] text-slate-500 dark:text-zinc-500 uppercase tracking-widest font-mono font-bold -mt-1">Video to Image Tool</span>
+          </div>
+        </a>
+
+        <!-- Header Nav Links & Theme Toggle -->
+        <div class="flex items-center gap-4">
+          <nav class="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400">
+            <a href="/" class="hover:text-amber-500 transition-colors">Tool</a>
+            <a href="/#how-it-works" class="hover:text-amber-500 transition-colors">How It Works</a>
+            <a href="/#faq" class="hover:text-amber-500 transition-colors">FAQ</a>
+            <a href="/about" class="hover:text-amber-500 transition-colors">About</a>
+            <a href="/privacy" class="hover:text-amber-500 transition-colors">Privacy</a>
+            <a href="/contact" class="hover:text-amber-500 transition-colors">Contact</a>
+          </nav>
+
+          <!-- Theme Toggle Component -->
+          <ThemeToggle client:load />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 z-10">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 mt-12 z-10 transition-colors">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-zinc-500">
+        <div class="flex flex-col items-center md:items-start gap-1">
+          <p class="font-semibold text-slate-800 dark:text-zinc-400">FrameCraft — Free Video to Image & Storyboard Converter</p>
+          <p class="text-[11px]">Instant, free, browser-based frame grabber. No registration or video upload required.</p>
+        </div>
+
+        <div class="flex items-center gap-6 font-medium">
+          <a href="/about" class="hover:text-amber-500 transition-colors">About Us</a>
+          <a href="/privacy" class="hover:text-amber-500 transition-colors">Privacy Policy</a>
+          <a href="/terms" class="hover:text-amber-500 transition-colors">Terms of Service</a>
+          <a href="/contact" class="hover:text-amber-500 transition-colors">Contact Us</a>
+        </div>
+      </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 pt-4 border-t border-slate-200 dark:border-zinc-900 text-center text-[10px] text-slate-500 dark:text-zinc-600 font-mono">
+        © {new Date().getFullYear()} FrameCraft Micro Tool. Deployed on Cloudflare Edge. All Rights Reserved.
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,40 +1,33 @@
-"use client";
-
-import React, { useState, useEffect, useRef } from "react";
-import { Upload, Video, X, Film, Play, Pause, Volume2, VolumeX, Scissors, Download } from "lucide-react";
-import toast from "react-hot-toast";
+import React, { useState, useEffect, useRef } from 'react';
+import { Upload, Video, X, Film, Play, Pause, Volume2, VolumeX, Scissors } from 'lucide-react';
 
 interface VideoUploadProps {
   onVideoSelected: (file: File) => void;
   onVideoCleared: () => void;
   selectedFile: File | null;
-  isProcessing: boolean;
   trimStart: number;
   trimEnd: number;
   onTrimChange: (start: number, end: number) => void;
-  onApplyTrim: () => void;
 }
 
 export default function VideoUpload({
   onVideoSelected,
   onVideoCleared,
   selectedFile,
-  isProcessing,
   trimStart,
   trimEnd,
-  onTrimChange,
-  onApplyTrim
+  onTrimChange
 }: VideoUploadProps) {
   const [isDragActive, setIsDragActive] = useState(false);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
 
-  // Custom video player states
+  // Video player controls
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
 
-  // Live frame preview states
+  // Boundary frame preview images
   const [startFrameImg, setStartFrameImg] = useState<string | null>(null);
   const [endFrameImg, setEndFrameImg] = useState<string | null>(null);
 
@@ -43,7 +36,6 @@ export default function VideoUpload({
   const startVideoRef = useRef<HTMLVideoElement>(null);
   const endVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Safely manage object URLs to prevent memory leaks
   useEffect(() => {
     if (!selectedFile) {
       setVideoSrc(null);
@@ -54,6 +46,7 @@ export default function VideoUpload({
       setEndFrameImg(null);
       return;
     }
+
     const url = URL.createObjectURL(selectedFile);
     setVideoSrc(url);
     return () => {
@@ -61,14 +54,12 @@ export default function VideoUpload({
     };
   }, [selectedFile]);
 
-  // Update start frame preview when trimStart changes
   useEffect(() => {
     const video = startVideoRef.current;
     if (!video || !videoSrc) return;
 
-    const captureFrame = () => {
+    const capture = () => {
       const canvas = document.createElement("canvas");
-      // Use video's natural dimensions to preserve exact aspect ratio
       canvas.width = video.videoWidth || 160;
       canvas.height = video.videoHeight || 90;
       const ctx = canvas.getContext("2d");
@@ -78,41 +69,23 @@ export default function VideoUpload({
       }
     };
 
-    const handleSeeked = () => {
-      captureFrame();
-    };
-
-    const handleLoadedData = () => {
-      captureFrame();
-    };
-
+    const handleSeeked = () => capture();
     video.addEventListener("seeked", handleSeeked);
-    video.addEventListener("loadeddata", handleLoadedData);
-    video.addEventListener("loadedmetadata", handleLoadedData);
-
-    // Seek
     video.currentTime = trimStart;
 
-    // Capture immediately if video data is already available
-    if (video.readyState >= 2) {
-      captureFrame();
-    }
+    if (video.readyState >= 2) capture();
 
     return () => {
       video.removeEventListener("seeked", handleSeeked);
-      video.removeEventListener("loadeddata", handleLoadedData);
-      video.removeEventListener("loadedmetadata", handleLoadedData);
     };
   }, [trimStart, videoSrc]);
 
-  // Update end frame preview when trimEnd changes
   useEffect(() => {
     const video = endVideoRef.current;
     if (!video || !videoSrc) return;
 
-    const captureFrame = () => {
+    const capture = () => {
       const canvas = document.createElement("canvas");
-      // Use video's natural dimensions to preserve exact aspect ratio
       canvas.width = video.videoWidth || 160;
       canvas.height = video.videoHeight || 90;
       const ctx = canvas.getContext("2d");
@@ -122,65 +95,38 @@ export default function VideoUpload({
       }
     };
 
-    const handleSeeked = () => {
-      captureFrame();
-    };
-
-    const handleLoadedData = () => {
-      video.currentTime = trimEnd;
-    };
-
+    const handleSeeked = () => capture();
     video.addEventListener("seeked", handleSeeked);
-    video.addEventListener("loadeddata", handleLoadedData);
-    video.addEventListener("loadedmetadata", handleLoadedData);
-
-    // Seek
     video.currentTime = trimEnd;
 
-    // Capture immediately if video data is already available
-    if (video.readyState >= 2) {
-      captureFrame();
-    }
+    if (video.readyState >= 2) capture();
 
     return () => {
       video.removeEventListener("seeked", handleSeeked);
-      video.removeEventListener("loadeddata", handleLoadedData);
-      video.removeEventListener("loadedmetadata", handleLoadedData);
     };
   }, [trimEnd, videoSrc]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragActive(true);
-    } else if (e.type === "dragleave") {
-      setIsDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setIsDragActive(true);
+    else if (e.type === "dragleave") setIsDragActive(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragActive(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.type.startsWith("video/")) {
-        onVideoSelected(file);
-      }
+      if (file.type.startsWith("video/")) onVideoSelected(file);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       onVideoSelected(e.target.files[0]);
     }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
   };
 
   const formatFileSize = (bytes: number) => {
@@ -191,23 +137,22 @@ export default function VideoUpload({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  // Custom Video Player Controls
+  const formatTime = (secs: number) => {
+    if (isNaN(secs)) return "0:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   const togglePlay = () => {
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play().catch(err => console.log("Playback interrupted:", err));
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
-  };
-
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent play/pause trigger when clicking mute
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
   };
 
   const handleTimeUpdate = () => {
@@ -233,23 +178,6 @@ export default function VideoUpload({
     }
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation(); // Prevent play/pause trigger when seeking
-    if (!videoRef.current || duration === 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
-    videoRef.current.currentTime = percentage * duration;
-    setCurrentTime(percentage * duration);
-  };
-
-  const formatTime = (secs: number) => {
-    if (isNaN(secs)) return "0:00";
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
   return (
     <div className="w-full">
       <input
@@ -258,9 +186,8 @@ export default function VideoUpload({
         className="hidden"
         accept="video/*"
         onChange={handleChange}
-        id="video-upload-input"
       />
-      {/* Hidden helper video elements for real-time background frame seeking */}
+
       {videoSrc && (
         <>
           <video ref={startVideoRef} src={videoSrc} className="hidden" muted playsInline />
@@ -274,56 +201,56 @@ export default function VideoUpload({
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
-          onClick={triggerFileInput}
-          className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 ${isDragActive
-            ? "border-amber-500 bg-amber-950/10 shadow-[0_0_20px_rgba(212,160,64,0.15)]"
-            : "border-zinc-800 bg-zinc-950/40 hover:border-zinc-700 hover:bg-zinc-950/60"
-            }`}
-          id="upload-dropzone"
+          onClick={() => fileInputRef.current?.click()}
+          className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 shadow-xl ${
+            isDragActive
+              ? 'border-amber-500 bg-amber-500/10'
+              : 'bg-white dark:bg-zinc-950/40 border-slate-300 dark:border-zinc-800 hover:border-amber-500/60'
+          }`}
         >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-            <div className="p-4 mb-4 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 group-hover:text-amber-500 transition-colors">
-              <Upload className="w-8 h-8" />
+          <div className="flex flex-col items-center justify-center text-center px-4">
+            <div className="p-4 mb-3 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-amber-500 transition-colors shadow-sm">
+              <Upload className="w-7 h-7" />
             </div>
-            <p className="mb-2 text-base text-zinc-200">
-              <span className="font-semibold text-amber-500">Click to upload</span> or drag and drop
+            <p className="mb-1 text-sm font-bold text-slate-900 dark:text-zinc-100">
+              <span className="text-amber-500">Click to upload video</span> or drag & drop
             </p>
-            <p className="text-xs text-zinc-500">
-              MP4, WebM or OGG (Short video clips are recommended)
+            <p className="text-xs text-slate-600 dark:text-zinc-400 font-medium">
+              Supports MP4, WebM, MOV, AVI, MKV (100% Private, Client-Side)
             </p>
           </div>
         </div>
       ) : (
-        <div className="relative flex flex-col p-3.5 sm:p-6 w-full min-w-0 rounded-2xl border border-zinc-800 bg-zinc-950/60 backdrop-blur-md">
+        <div className="relative flex flex-col p-5 w-full rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 backdrop-blur-xl shadow-xl transition-colors">
           <button
+            type="button"
             onClick={onVideoCleared}
-            className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 rounded-full border border-zinc-800 transition-all z-10"
+            className="absolute top-4 right-4 p-1.5 text-slate-500 dark:text-zinc-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full border border-slate-300 dark:border-zinc-700 transition-all z-10"
             title="Remove video"
-            id="btn-remove-video"
           >
             <X className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 border border-primary/20 text-primary rounded-xl">
-              <Video className="w-6 h-6 animate-pulse" />
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-xl">
+              <Video className="w-5 h-5" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-zinc-100 truncate">
+            <div className="flex-1 min-w-0 pr-8">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">
                 {selectedFile.name}
               </p>
-              <div className="flex gap-4 text-xs text-zinc-400 mt-1">
+              <div className="flex gap-4 text-[11px] text-slate-600 dark:text-zinc-400 font-semibold mt-0.5">
                 <span>Size: {formatFileSize(selectedFile.size)}</span>
-                <span className="flex items-center gap-1">
-                  <Film className="w-3.5 h-3.5" /> Video Format
+                <span className="flex items-center gap-1 font-mono">
+                  <Film className="w-3 h-3 text-amber-500" /> {formatTime(duration)}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Custom Cinematic Video Preview Player */}
+          {/* Cinematic Video Player */}
           {videoSrc && (
-            <div className="relative mt-4 w-full rounded-xl overflow-hidden border border-zinc-900 bg-black/60 shadow-inner group">
+            <div className="relative mt-4 w-full rounded-xl overflow-hidden border border-slate-300 dark:border-zinc-800 bg-black shadow-inner group">
               <video
                 ref={videoRef}
                 src={videoSrc}
@@ -332,131 +259,79 @@ export default function VideoUpload({
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onClick={togglePlay}
-                className="w-full h-auto max-h-48 object-contain block mx-auto cursor-pointer"
+                className="w-full h-auto max-h-52 object-contain block mx-auto cursor-pointer"
               />
 
-              {/* Custom Cinematic Overlay Controls (shows on hover) */}
               <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 z-20">
-
-                {/* Custom Progress Bar / Seek Slider */}
-                <div
-                  onClick={handleSeek}
-                  className="relative w-full h-1 bg-zinc-800 rounded-full cursor-pointer hover:h-1.5 transition-all"
-                >
-                  <div
-                    className="absolute top-0 left-0 h-full bg-primary rounded-full"
-                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                  />
-                </div>
-
-                {/* Buttons Row */}
-                <div className="flex items-center justify-between text-zinc-350">
+                <div className="flex items-center justify-between text-zinc-300">
                   <div className="flex items-center gap-3">
-
-                    {/* Play/Pause Button */}
                     <button
+                      type="button"
                       onClick={togglePlay}
-                      className="hover:text-primary transition-colors cursor-pointer"
-                      title={isPlaying ? "Pause" : "Play"}
+                      className="hover:text-amber-500 transition-colors"
                     >
-                      {isPlaying ? (
-                        <Pause className="w-4.5 h-4.5 fill-current" />
-                      ) : (
-                        <Play className="w-4.5 h-4.5 fill-current" />
-                      )}
+                      {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
                     </button>
-
-                    {/* Mute/Unmute Button */}
                     <button
-                      onClick={toggleMute}
-                      className="hover:text-primary transition-colors cursor-pointer"
-                      title={isMuted ? "Unmute" : "Mute"}
+                      type="button"
+                      onClick={() => {
+                        if (videoRef.current) {
+                          videoRef.current.muted = !isMuted;
+                          setIsMuted(!isMuted);
+                        }
+                      }}
+                      className="hover:text-amber-500 transition-colors"
                     >
-                      {isMuted ? (
-                        <VolumeX className="w-4.5 h-4.5" />
-                      ) : (
-                        <Volume2 className="w-4.5 h-4.5" />
-                      )}
+                      {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                     </button>
-
-                    {/* Timeline Text */}
-                    <span className="text-[10px] font-mono text-zinc-400">
+                    <span className="text-[10px] font-mono text-zinc-300">
                       {formatTime(currentTime)} / {formatTime(duration)}
                     </span>
                   </div>
-
-                  {/* Right side: Film strip indicator */}
-                  <div className="flex items-center gap-1 opacity-60">
-                    <Film className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[9px] font-bold uppercase tracking-wider font-sans">Active Preview</span>
-                  </div>
                 </div>
-
               </div>
             </div>
           )}
 
-          {/* Video Trimmer / Clipper Controls */}
+          {/* Trimmer Sliders */}
           {duration > 0 && (
-            <div className="mt-4 p-3 sm:p-4 w-full min-w-0 rounded-xl border border-zinc-900/60 bg-zinc-950/40 flex flex-col gap-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 font-sans">
-                  <Scissors className="w-3.5 h-3.5 text-primary" />
-                  Video Trimmer / Clipper
+            <div className="mt-4 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950/80 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-800 dark:text-zinc-200 uppercase tracking-wider flex items-center gap-1.5 font-sans">
+                  <Scissors className="w-3.5 h-3.5 text-amber-500" />
+                  Video Trim Range
                 </span>
-                <span className="text-[10px] font-mono text-zinc-400 font-bold bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-md self-start sm:self-auto">
-                  Range: {formatTime(trimStart)} - {formatTime(trimEnd)}
+                <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-bold">
+                  {formatTime(trimStart)} — {formatTime(trimEnd)}
                 </span>
               </div>
 
-              {/* Live Boundary Frame Previews */}
-              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 sm:gap-4 mb-2.5">
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[9px] font-extrabold text-zinc-550 uppercase tracking-wider font-sans">
-                    Start Frame Preview ({formatTime(trimStart)})
-                  </span>
-                  <div className="aspect-video w-full rounded-lg overflow-hidden border border-zinc-900 bg-zinc-950/80 flex items-center justify-center relative shadow-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-mono text-slate-600 dark:text-zinc-400 font-bold">START ({formatTime(trimStart)})</span>
+                  <div className="aspect-video w-full rounded-lg overflow-hidden border border-slate-300 dark:border-zinc-800 bg-black flex items-center justify-center">
                     {startFrameImg ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={startFrameImg} alt="Start Boundary Frame" className="w-full h-full object-contain select-none animate-in fade-in duration-200" />
+                      <img src={startFrameImg} alt="Start frame" className="w-full h-full object-contain" />
                     ) : (
-                      <div className="text-[10px] text-zinc-600 font-mono flex items-center gap-1.5">
-                        <div className="w-3 h-3 border border-zinc-700 border-t-transparent rounded-full animate-spin"></div>
-                        Decoding...
-                      </div>
+                      <span className="text-[9px] font-mono text-zinc-400">Loading...</span>
                     )}
-                    <div className="absolute bottom-1.5 left-2 bg-[#0c0c0e]/85 border border-zinc-800 text-[8px] font-mono px-1.5 py-0.5 rounded text-primary shadow-md">
-                      Start
-                    </div>
                   </div>
                 </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[9px] font-extrabold text-zinc-550 uppercase tracking-wider font-sans">
-                    End Frame Preview ({formatTime(trimEnd)})
-                  </span>
-                  <div className="aspect-video w-full rounded-lg overflow-hidden border border-zinc-900 bg-zinc-950/80 flex items-center justify-center relative shadow-sm">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-mono text-slate-600 dark:text-zinc-400 font-bold">END ({formatTime(trimEnd)})</span>
+                  <div className="aspect-video w-full rounded-lg overflow-hidden border border-slate-300 dark:border-zinc-800 bg-black flex items-center justify-center">
                     {endFrameImg ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={endFrameImg} alt="End Boundary Frame" className="w-full h-full object-contain select-none animate-in fade-in duration-200" />
+                      <img src={endFrameImg} alt="End frame" className="w-full h-full object-contain" />
                     ) : (
-                      <div className="text-[10px] text-zinc-600 font-mono flex items-center gap-1.5">
-                        <div className="w-3 h-3 border border-zinc-700 border-t-transparent rounded-full animate-spin"></div>
-                        Decoding...
-                      </div>
+                      <span className="text-[9px] font-mono text-zinc-400">Loading...</span>
                     )}
-                    <div className="absolute bottom-1.5 left-2 bg-[#0c0c0e]/85 border border-zinc-800 text-[8px] font-mono px-1.5 py-0.5 rounded text-primary shadow-md">
-                      End
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Trimmer Sliders */}
-              <div className="flex flex-col gap-3 mt-1 w-full">
-                {/* Start Slider */}
-                <div className="flex items-center gap-3 w-full">
-                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 shrink-0 font-sans">START</span>
+              <div className="flex flex-col gap-2 mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-slate-600 dark:text-zinc-400 font-bold w-10">START</span>
                   <input
                     type="range"
                     min={0}
@@ -464,19 +339,14 @@ export default function VideoUpload({
                     step={0.1}
                     value={trimStart}
                     onChange={(e) => {
-                      const val = parseFloat(e.target.value);
-                      if (val < trimEnd - 0.5) {
-                        onTrimChange(val, trimEnd);
-                      }
+                      const v = parseFloat(e.target.value);
+                      if (v < trimEnd - 0.2) onTrimChange(v, trimEnd);
                     }}
-                    className="flex-1 w-full min-w-0 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 accent-amber-500 h-1 bg-slate-300 dark:bg-zinc-800 rounded-lg cursor-pointer"
                   />
-                  <span className="text-[10px] font-mono text-zinc-400 w-10 shrink-0 text-right">{formatTime(trimStart)}</span>
                 </div>
-
-                {/* End Slider */}
-                <div className="flex items-center gap-3 w-full">
-                  <span className="text-[9px] font-extrabold text-zinc-500 w-8 shrink-0 font-sans">END</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-slate-600 dark:text-zinc-400 font-bold w-10">END</span>
                   <input
                     type="range"
                     min={0}
@@ -484,36 +354,13 @@ export default function VideoUpload({
                     step={0.1}
                     value={trimEnd}
                     onChange={(e) => {
-                      const val = parseFloat(e.target.value);
-                      if (val > trimStart + 0.5) {
-                        onTrimChange(trimStart, val);
-                      }
+                      const v = parseFloat(e.target.value);
+                      if (v > trimStart + 0.2) onTrimChange(trimStart, v);
                     }}
-                    className="flex-1 w-full min-w-0 accent-primary h-1 bg-zinc-700 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 accent-amber-500 h-1 bg-slate-300 dark:bg-zinc-800 rounded-lg cursor-pointer"
                   />
-                  <span className="text-[10px] font-mono text-zinc-400 w-10 shrink-0 text-right">{formatTime(trimEnd)}</span>
                 </div>
               </div>
-
-              {/* Trimmer Actions */}
-              <div className="mt-4 pt-3 border-t border-zinc-900/60">
-                <button
-                  onClick={onApplyTrim}
-                  disabled={isProcessing}
-                  className="w-full py-2 px-4 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-primary-foreground shadow-md active:scale-95 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer font-sans text-center"
-                  id="btn-apply-trim-extract"
-                >
-                  {isProcessing ? "Extracting..." : "Update Storyboard"}
-                </button>
-              </div>
-
-            </div>
-          )}
-
-          {isProcessing && (
-            <div className="mt-4 p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl flex items-center justify-center gap-3 text-sm text-zinc-400">
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span>Extracting video frames in the browser...</span>
             </div>
           )}
         </div>
